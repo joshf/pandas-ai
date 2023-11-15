@@ -4,6 +4,6 @@ pandas
 pydeck
 streamlit
 langchain
-langchain_expelrimental
+langchain_experimental
 tabulate
 openai
