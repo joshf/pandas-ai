@@ -56,6 +56,11 @@ if uploaded_file:
     df = load_data(uploaded_file)
 
 openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
+temperature = st.sidebar.text_input("Temperature", value=0)
+model = st.sidebar.selectbox(
+    "Model",
+    ("gpt-4", "gpt-4-1106-preview"),
+)
 if "messages" not in st.session_state or st.sidebar.button("Clear conversation history"):
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
@@ -71,7 +76,7 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
         st.stop()
 
     llm = ChatOpenAI(
-        temperature=0, model="gpt-4-1106-preview", openai_api_key=openai_api_key, streaming=True
+        temperature=temperature, model=model, openai_api_key=openai_api_key, streaming=True
     )
 
     pandas_df_agent = create_pandas_dataframe_agent(
@@ -82,6 +87,8 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
         handle_parsing_errors=True,
     )
 
+    print(model, temperature)
+    
     with st.chat_message("assistant"):
         st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
         response = pandas_df_agent.run(st.session_state.messages, callbacks=[st_cb])
